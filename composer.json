@@ -1,0 +1,13 @@
+{
+    "name": "adriansolier322/etiquetador-osl",
+    "description": "Herramienta open source para etiquetar distintos equipos informaticos.",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
