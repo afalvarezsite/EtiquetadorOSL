@@ -37,4 +37,14 @@ class Sn extends Model
         $stmt = $this->db->query("SELECT MIN(id) AS id, prefix, MAX(num) AS num FROM {$this->table} GROUP BY prefix ORDER BY prefix ASC");
         return $stmt->fetchAll();
     }
+
+    public function deleteAll()
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM {$this->table}");
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
 }

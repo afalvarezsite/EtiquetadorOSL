@@ -31,6 +31,7 @@ $router->get('/generator/get_saved_models', 'LabelController', 'getSavedModels',
 $router->get('/generator/get_model', 'LabelController', 'getModel', ['AuthMiddleware']);
 $router->get('/generator/delete_save_model', 'LabelController', 'deleteModel', ['AuthMiddleware']);
 $router->get('/generator/edit_model_name', 'LabelController', 'editModelName', ['AuthMiddleware']);
+$router->get('/generator/clear_preview', 'LabelController', 'clearPreview', ['AuthMiddleware']);
 
 // Admin Dashboard
 $router->get('/admin', 'AdminController', 'index', ['AuthMiddleware', 'AdminMiddleware']);

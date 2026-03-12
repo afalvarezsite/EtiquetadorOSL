@@ -1,6 +1,8 @@
-content/EtiquetadorOSL/pdf/finalraid/*
-content/EtiquetadorOSL/pdf/qrcodes/*
-content/EtiquetadorOSL/pdf/raid/*
+public/pdf/finalraid/*
+public/pdf/qrcodes/*
+public/pdf/raid/*
 
-content/EtiquetadorOSL/pdf/generado.pdf
+public/pdf/generado.pdf
 .aider*
+
+certs/*

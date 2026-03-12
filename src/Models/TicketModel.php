@@ -25,4 +25,14 @@ class TicketModel extends Model
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    public function deleteAll()
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM {$this->table}");
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
 }

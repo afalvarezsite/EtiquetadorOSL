@@ -78,4 +78,14 @@ class User extends Model
         $stmt = $this->db->query("SELECT * FROM roles ORDER BY id_rol ASC");
         return $stmt->fetchAll();
     }
+
+    public function deleteAll($currentUserId)
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id != ?");
+            return $stmt->execute([$currentUserId]);
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
 }

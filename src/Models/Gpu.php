@@ -14,6 +14,13 @@ class Gpu extends Model
         return $stmt->execute([$name]);
     }
 
+    public function findByName($name)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE name = ?");
+        $stmt->execute([$name]);
+        return $stmt->fetch();
+    }
+
     public function getDistinctNames()
     {
         $stmt = $this->db->query("SELECT DISTINCT name FROM {$this->table} ORDER BY name ASC");
@@ -44,5 +51,15 @@ class Gpu extends Model
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM pc WHERE gpu_name = ?");
         $stmt->execute([$id]);
         return $stmt->fetchColumn() > 0;
+    }
+
+    public function deleteAll()
+    {
+        try {
+            $stmt = $this->db->prepare("DELETE FROM {$this->table}");
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 }

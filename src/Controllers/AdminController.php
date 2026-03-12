@@ -24,6 +24,8 @@ class AdminController extends Controller
             'pcCount' => $pcModel->getTotalCount(),
             'wifiCount' => $pcModel->countWifi(),
             'bluetoothCount' => $pcModel->countBluetooth(),
+            'biosCount' => $pcModel->countBios(),
+            'uefiCount' => $pcModel->countUefi(),
             'modelsCount' => count($ticketModel->getAll())
         ];
 
@@ -51,7 +53,7 @@ class AdminController extends Controller
             }
         }
 
-        // Handle Add, Edit, Search
+        // Handle Add, Edit, Search, Import
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['add'])) {
                 $name = trim($_POST['name']);
@@ -79,6 +81,50 @@ class AdminController extends Controller
             } elseif (isset($_POST['search'])) {
                 $txt = urlencode($_POST['pattern']);
                 $this->redirect("admin/cpu?search=$txt");
+            } elseif (isset($_POST['import'])) {
+                if (isset($_FILES['import_file']) && $_FILES['import_file']['error'] === UPLOAD_ERR_OK) {
+                    $file = $_FILES['import_file']['tmp_name'];
+                    $ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+                    $addedCount = 0;
+                    $skippedCount = 0;
+
+                    if ($ext === 'csv') {
+                        if (($handle = fopen($file, "r")) !== FALSE) {
+                            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                                $name = trim($data[0]);
+                                if (!empty($name)) {
+                                    if (!$cpuModel->findByName($name)) {
+                                        $cpuModel->create($name);
+                                        $addedCount++;
+                                    } else {
+                                        $skippedCount++;
+                                    }
+                                }
+                            }
+                            fclose($handle);
+                        }
+                    } else {
+                        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                        foreach ($lines as $line) {
+                            $name = trim($line);
+                            if (!empty($name)) {
+                                if (!$cpuModel->findByName($name)) {
+                                    $cpuModel->create($name);
+                                    $addedCount++;
+                                } else {
+                                    $skippedCount++;
+                                }
+                            }
+                        }
+                    }
+                    $this->redirect("admin/cpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+                }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($cpuModel->deleteAll()) {
+                    $this->redirect('admin/cpu?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar todas las entradas. Puede que haya dependencias (PCs asociadas).";
+                }
             }
         }
 
@@ -90,6 +136,13 @@ class AdminController extends Controller
                 $successMessage = "CPU añadida correctamente.";
             if ($_GET['msg'] === 'edited')
                 $successMessage = "CPU actualizada correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todas las CPUs han sido eliminadas.";
+            if ($_GET['msg'] === 'imported') {
+                $added = $_GET['added'] ?? 0;
+                $skipped = $_GET['skipped'] ?? 0;
+                $successMessage = "Importación finalizada: $added añadidas, $skipped omitidas (duplicadas).";
+            }
         }
 
         // Fetch Data
@@ -126,7 +179,7 @@ class AdminController extends Controller
             }
         }
 
-        // Handle Add, Edit, Search
+        // Handle Add, Edit, Search, Import
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['add'])) {
                 $name = trim($_POST['name']);
@@ -154,6 +207,50 @@ class AdminController extends Controller
             } elseif (isset($_POST['search'])) {
                 $txt = urlencode($_POST['pattern']);
                 $this->redirect("admin/gpu?search=$txt");
+            } elseif (isset($_POST['import'])) {
+                if (isset($_FILES['import_file']) && $_FILES['import_file']['error'] === UPLOAD_ERR_OK) {
+                    $file = $_FILES['import_file']['tmp_name'];
+                    $ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+                    $addedCount = 0;
+                    $skippedCount = 0;
+
+                    if ($ext === 'csv') {
+                        if (($handle = fopen($file, "r")) !== FALSE) {
+                            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                                $name = trim($data[0]);
+                                if (!empty($name)) {
+                                    if (!$gpuModel->findByName($name)) {
+                                        $gpuModel->create($name);
+                                        $addedCount++;
+                                    } else {
+                                        $skippedCount++;
+                                    }
+                                }
+                            }
+                            fclose($handle);
+                        }
+                    } else {
+                        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                        foreach ($lines as $line) {
+                            $name = trim($line);
+                            if (!empty($name)) {
+                                if (!$gpuModel->findByName($name)) {
+                                    $gpuModel->create($name);
+                                    $addedCount++;
+                                } else {
+                                    $skippedCount++;
+                                }
+                            }
+                        }
+                    }
+                    $this->redirect("admin/gpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+                }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($gpuModel->deleteAll()) {
+                    $this->redirect('admin/gpu?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar todas las entradas. Puede que haya dependencias (PCs asociadas).";
+                }
             }
         }
 
@@ -165,6 +262,13 @@ class AdminController extends Controller
                 $successMessage = "GPU añadida correctamente.";
             if ($_GET['msg'] === 'edited')
                 $successMessage = "GPU actualizada correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todas las GPUs han sido eliminadas.";
+            if ($_GET['msg'] === 'imported') {
+                $added = $_GET['added'] ?? 0;
+                $skipped = $_GET['skipped'] ?? 0;
+                $successMessage = "Importación finalizada: $added añadidas, $skipped omitidas (duplicadas).";
+            }
         }
 
         // Fetch Data
@@ -235,6 +339,12 @@ class AdminController extends Controller
             } else {
                 $errorMessage = "Error al añadir PC.";
             }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteAll'])) {
+            if ($pcModel->deleteAll()) {
+                $this->redirect('admin/pc?msg=all_deleted');
+            } else {
+                $errorMessage = "Error al eliminar todas las PCs.";
+            }
         }
 
         // Handle Messages
@@ -243,6 +353,8 @@ class AdminController extends Controller
                 $successMessage = "PC eliminada correctamente.";
             if ($_GET['msg'] === 'added')
                 $successMessage = "PC añadida correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todas las PCs han sido eliminadas.";
         }
 
         // Fetch Data
@@ -305,6 +417,12 @@ class AdminController extends Controller
                         $errorMessage = "Error al editar prefijo SN.";
                     }
                 }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($snModel->deleteAll()) {
+                    $this->redirect('admin/sn?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar todos los perfiles SN.";
+                }
             }
         }
 
@@ -316,6 +434,8 @@ class AdminController extends Controller
                 $successMessage = "Prefijo SN añadido correctamente.";
             if ($_GET['msg'] === 'edited')
                 $successMessage = "Prefijo SN editado correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todos los prefijos SN han sido eliminados.";
         }
 
         $sns = $snModel->getAll();
@@ -376,6 +496,12 @@ class AdminController extends Controller
                 } else {
                     $errorMessage = "El nombre del modelo no puede estar vacío.";
                 }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($model->deleteAll()) {
+                    $this->redirect('admin/models?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar todos los modelos.";
+                }
             }
         }
 
@@ -387,6 +513,8 @@ class AdminController extends Controller
                 $successMessage = "Modelo añadido correctamente.";
             if ($_GET['msg'] === 'edited')
                 $successMessage = "Modelo actualizado correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todos los modelos han sido eliminados.";
         }
 
         // Fetch Data
@@ -474,6 +602,12 @@ class AdminController extends Controller
                 } else {
                     $errorMessage = "Error al cambiar el rol.";
                 }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($userModel->deleteAll($_SESSION['user_id'])) {
+                    $this->redirect('admin/users?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar usuarios.";
+                }
             }
         }
 
@@ -489,6 +623,8 @@ class AdminController extends Controller
                 $successMessage = "Correo electrónico actualizado correctamente.";
             if ($_GET['msg'] === 'role_updated')
                 $successMessage = "Rol actualizado correctamente.";
+            if ($_GET['msg'] === 'all_deleted')
+                $successMessage = "Todos los usuarios (excepto tú) han sido eliminados.";
         }
 
         // Fetch Data
@@ -561,6 +697,32 @@ class AdminController extends Controller
                         FROM pc
                         LEFT JOIN gpu ON pc.gpu_name = gpu.id
                         GROUP BY pc.gpu_name, pc.gpu_type, gpu.name
+                        ORDER BY value DESC
+                    ";
+                    break;
+                case 'wifi':
+                    $query = "
+                        SELECT
+                            CASE
+                                WHEN wifi = 'true' THEN 'Con WiFi'
+                                ELSE 'Sin WiFi'
+                            END AS label,
+                            COUNT(id) AS value
+                        FROM pc
+                        GROUP BY wifi
+                        ORDER BY value DESC
+                    ";
+                    break;
+                case 'bluetooth':
+                    $query = "
+                        SELECT
+                            CASE
+                                WHEN bluetooth = 'true' THEN 'Con Bluetooth'
+                                ELSE 'Sin Bluetooth'
+                            END AS label,
+                            COUNT(id) AS value
+                        FROM pc
+                        GROUP BY bluetooth
                         ORDER BY value DESC
                     ";
                     break;

@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Usuarios</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -28,7 +29,7 @@
         <div class="card">
             <h2>Añadir Nuevo Usuario</h2>
             <form method="post" action="<?= BASE_URL ?>admin/users">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end;">
+                <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end;">
                     <div class="form-group" style="margin:0">
                         <label>Usuario:</label>
                         <input type="text" name="username" required>
@@ -47,11 +48,13 @@
         </div>
 
         <div class="card">
-            <h2>Lista de Usuarios</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">Lista de Usuarios</h2>
+            </div>
             <?php if (empty($users)): ?>
                 <p>No hay usuarios registrados.</p>
             <?php else: ?>
-                <div style="overflow-x: auto;">
+                <div class="table-responsive">
                     <table class="tabla-modelo">
                         <thead>
                             <tr>
@@ -159,6 +162,28 @@
                 </form>
             </div>
         </div>
+
+        <?php if (count($users) > 1): ?>
+            <!-- Danger Zone -->
+            <div class="danger-zone">
+                <div class="danger-zone-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e94e3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <h3>Zona de Peligro</h3>
+                </div>
+                <div class="danger-zone-content">
+                    <div class="danger-zone-text">
+                        <p>Las siguientes acciones son irreversibles. No podrás borrar tu propia cuenta administrativa.</p>
+                    </div>
+                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/users" style="display:none;">
+                        <input type="hidden" name="deleteAll" value="1">
+                    </form>
+                    <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todos los usuarios (excepto tú)', 'deleteAllForm')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        Eliminar todos los usuarios
+                    </button>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
     <script src="<?= BASE_URL ?>assets/js/script.js"></script>

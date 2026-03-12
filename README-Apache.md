@@ -1,113 +1,144 @@
-# Guía de instalación del Etiquetador OSL
-> [!Warning]  
-> Esta guía se ha hecho sobre un sistema basado en debian (ubuntu 24.04.2 LTS).  
+# Guía de instalación del Etiquetador OSL (Apache)
+
+> [!WARNING]  
+> Esta guía ha sido probada en sistemas basados en Debian (Ubuntu 24.04 LTS). Los pasos pueden variar ligeramente en otras distribuciones.
 
 ## Instalación
----
 
-## Paso 1: Actualizar el sistema
+### Paso 1: Actualizar el sistema
 
 ```bash
-sudo apt update
+sudo apt update && sudo apt upgrade -y
 ```
 
----
-
-## Paso 2: Instalar Apache
+### Paso 2: Instalar Apache
 
 ```bash
 sudo apt install apache2 -y
 ```
 
-**Verificar que funciona:**
+**Verificación:** Visita `http://localhost` en tu navegador. Deberías ver la página por defecto de Apache.
 
-Abre tu navegador y visita:
-
-```
-http://localhost
-```
-
-Deberías ver la página de bienvenida de Apache (si no funciona prueba cambiando localhost por la ip de la maquina donde lo has instalado).
-
----
-
-## Paso 3: Instalar MySQL o MariaDB
+### Paso 3: Instalar MariaDB (MySQL)
 
 ```bash
 sudo apt install mariadb-server -y
+sudo mysql_secure_installation
 ```
+
+### Paso 4: Instalar PHP 8.2 y extensiones
+
+```bash
+sudo apt install php8.2 libapache2-mod-php8.2 php8.2-mysql php8.2-gd php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip -y
+```
+
+### Paso 5: Instalar Python y dependencias de PDF
+
+```bash
+sudo apt install python3 python3-pip python3-venv -y
+# Configurar entorno virtual para scripts de etiquetado
+sudo python3 -m venv /opt/venv-etiquetador
+sudo /opt/venv-etiquetador/bin/pip install pymupdf fillpdf
+```
+
 ---
 
-## Paso 4: Instalar PHP
+## Configuración del Proyecto
+
+### 1. Descargar el código
 
 ```bash
-sudo apt install php libapache2-mod-php php-mysql -y
+cd /var/www
+sudo git clone https://github.com/Adriansolier322/EtiquetadorOSL.git etiquetador
+sudo chown -R www-data:www-data /var/www/etiquetador
 ```
 
-## Paso 5: Instalar Python y librerias
-```bash
-sudo apt install python3 python3-pip
-sudo pip install --break-system-packages fillpdf
-sudo pip install --break-system-packages pymupdf
-```
-## Configuración
+### 2. Configurar el VirtualHost de Apache
 
-Una vez hayas instalado todo vamos a comenzar con la puesta en marcha.
-
-### Descargar el proyecto
-```bash
-sudo git clone https://github.com/Adriansolier322/EtiquetadorOSL.git
-```
-esto se nos creara un directorio llamado EtiquetadorOSL.
-
-### Configuración de Apache
-> [!important]  
-> En necesario que te encuentres en el directorio en el que has descargado el proyecto  
+Crea un nuevo archivo de configuración:
 
 ```bash
-sudo mkdir /var/www/etiquetador
-sudo cp EtiquetadorOSL/content/* /var/www/etiquetador/
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-avaliable/etiquetador.conf
-sudo nano /etc/nginx/sites-available/etiquetador.conf
+sudo nano /etc/apache2/sites-available/etiquetador.conf
 ```
-Dentro de este nuevo archivo de configuración debemos cambiar la linea `DocumentRoot /var/www/html` por `DocumentRoot /var/www/etiquetador`
 
-### Configuración de MySQL
-```bash
-mysql -u root -p
+Pega el siguiente contenido (ajustando si es necesario):
+
+```apache
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/etiquetador/public
+
+    <Directory /var/www/etiquetador/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+        
+        # Habilitar reescritura para el enrutador
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^ index.php [L]
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/etiquetador_error.log
+    CustomLog ${APACHE_LOG_DIR}/etiquetador_access.log combined
+</VirtualHost>
 ```
-o
+
+Habilita el sitio y módulos necesarios:
+
 ```bash
-sudo mysql
+sudo a2enmod rewrite
+sudo a2dissite 000-default.conf
+sudo a2ensite etiquetador.conf
+sudo systemctl restart apache2
 ```
-Dentro de la consola de MySQL o MariaDB ejecutaremos  
-> [!important]
-> Cambia nombre_DB, nombre_usuario y contraseña por el nombre de base de datos, usuario y contraseña que desees  
+
+### 3. Configuración de la Base de Datos
+
+Accede a MariaDB:
+
+```bash
+sudo mariadb
+```
+
+Ejecuta las siguientes consultas:
 
 ```sql
 CREATE DATABASE etiquetador;
-CREATE USER 'etiquetador'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON etiquetador.* TO 'etiquetador'@'localhost';
+CREATE USER 'etiquetador_user'@'localhost' IDENTIFIED BY 'tu_contraseña_segura';
+GRANT ALL PRIVILEGES ON etiquetador.* TO 'etiquetador_user'@'localhost';
 FLUSH PRIVILEGES;
 USE etiquetador;
-SOURCE /var/www/etiquetador/EtiquetadorOSL/scripts/template.sql;
+SOURCE /var/www/etiquetador/init.sql;
 EXIT;
 ```
 
-Una vez hayamos configurado la base de datos debemos introducir los datos de acceso en el archivo configuration.php, y tras esto iniciamos la pagina y reiniciamos apache con el siguiente comando:
-```bash
-a2dissite 000-default.conf
-a2ensite etiquetador.conf
-systemctl restart apache2
-```
-Con esto ya estaria todo listo.
+### 4. Configurar variables de entorno
 
-> [!important]  
-> Debemos de ejecutar el siguiente comando para que la página web funcione correctamente
+Edita el archivo de configuración de la aplicación:
+
 ```bash
-sudo chown -R www-data:www-data '/var/www' && sudo chmod -R 660 '/var/www' && sudo find '/var/www' -type d -exec chmod 2770 {} +
-```  
->[!important]
-> El usuario admin inicial tiene las siguientes credenciales, por favor, es importante cambiarlo una vez esté desplegado y configurado.
-> Usuario: admin
-> Contraseña: admin123 
+sudo nano /var/www/etiquetador/config/config.php
+```
+
+Asegúrate de que los datos de `DB_HOST`, `DB_NAME`, `DB_USER` y `DB_PASS` coincidan con los pasos anteriores.
+
+---
+
+## Permisos Finales
+
+Es crucial que el servidor web tenga permisos de escritura en las carpetas de logs o temporales si las hubiera:
+
+```bash
+sudo chown -R www-data:www-data /var/www/etiquetador
+sudo chmod -R 775 /var/www/etiquetador
+```
+
+> [!IMPORTANT]
+> **Credenciales por defecto:**
+>
+> - **Usuario:** admin
+> - **Contraseña:** admin123
+>
+> *Recuerda cambiar la contraseña inmediatamente desde el panel de administración.*

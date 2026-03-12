@@ -30,6 +30,100 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initial state
         ticketNameInput.required = saveCheckbox.checked;
     }
+
+    // Animación de números incrementales para el dashboard (v2 - Robusta)
+    const counters = document.querySelectorAll('.counter');
+    const animationDuration = 1000; // 2 segundos
+
+    const easeOutQuad = (t) => t * (2 - t);
+
+    counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        if (target === 0) {
+            counter.innerText = '0';
+            return;
+        }
+
+        let startTime = null;
+
+        const updateCount = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / animationDuration, 1);
+            const easedProgress = easeOutQuad(progress);
+
+            const currentCount = Math.floor(easedProgress * target);
+            counter.innerText = currentCount;
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCount);
+            } else {
+                counter.innerText = target;
+            }
+        };
+
+        requestAnimationFrame(updateCount);
+    });
+
+    // Lógica de Drag & Drop para importaciones
+    document.querySelectorAll(".drop-zone").forEach(dropZoneElement => {
+        const inputElement = dropZoneElement.querySelector(".drop-zone__input");
+
+        dropZoneElement.addEventListener("click", (e) => {
+            inputElement.click();
+        });
+
+        inputElement.addEventListener("change", (e) => {
+            if (inputElement.files.length) {
+                updateThumbnail(dropZoneElement, inputElement.files[0]);
+            }
+        });
+
+        dropZoneElement.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZoneElement.classList.add("drop-zone--over");
+        });
+
+        ["dragleave", "dragend"].forEach((type) => {
+            dropZoneElement.addEventListener(type, (e) => {
+                dropZoneElement.classList.remove("drop-zone--over");
+            });
+        });
+
+        dropZoneElement.addEventListener("drop", (e) => {
+            e.preventDefault();
+
+            if (e.dataTransfer.files.length) {
+                inputElement.files = e.dataTransfer.files;
+                updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+            }
+
+            dropZoneElement.classList.remove("drop-zone--over");
+        });
+    });
+
+    /**
+     * Actualiza el contenido visual de la zona de drop con el nombre del archivo
+     * @param {HTMLElement} dropZoneElement
+     * @param {File} file
+     */
+    function updateThumbnail(dropZoneElement, file) {
+        let promptElement = dropZoneElement.querySelector(".drop-zone__prompt");
+
+        // Quitar el prompt si existe
+        if (promptElement) {
+            promptElement.remove();
+        }
+
+        // Crear/Actualizar el elemento thumb
+        let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+        if (!thumbnailElement) {
+            thumbnailElement = document.createElement("div");
+            thumbnailElement.classList.add("drop-zone__thumb");
+            dropZoneElement.appendChild(thumbnailElement);
+        }
+
+        thumbnailElement.dataset.label = file.name;
+    }
 });
 
 
@@ -260,6 +354,92 @@ function editModelName(modelName, modelId) {
             } catch (error) {
                 console.error('Error en editmodel:', error);
             }
+        }
+    });
+}
+
+// Función para limpiar el preview (borrar generado.pdf)
+function clearPreview() {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¿Deseas eliminar el PDF generado actual?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'my-popup-class',
+            confirmButton: 'my-confirm-button',
+            cancelButton: 'my-cancel-button'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/generator/clear_preview')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: '¡Borrado!',
+                            text: 'El preview ha sido eliminado.',
+                            icon: 'success',
+                            customClass: {
+                                popup: 'my-popup-class',
+                                confirmButton: 'my-confirm-button'
+                            }
+                        });
+                        refresh_iframe();
+                    } else {
+                        Swal.fire({
+                            title: 'Información',
+                            text: 'No había ningún PDF generado para borrar.',
+                            icon: 'info',
+                            customClass: {
+                                popup: 'my-popup-class',
+                                confirmButton: 'my-confirm-button'
+                            }
+                        });
+                        refresh_iframe();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Hubo un problema al intentar borrar el PDF.',
+                        icon: 'error',
+                        customClass: {
+                            popup: 'my-popup-class',
+                            confirmButton: 'my-confirm-button'
+                        }
+                    });
+                });
+        }
+    });
+}
+
+/**
+ * Muestra un aviso de confirmación para eliminar todas las entradas de una tabla
+ * @param {string} entityName Nombre de la entidad (ej: "CPUs")
+ * @param {string} formId ID del formulario oculto que realiza el POST
+ */
+function confirmMassDeletion(entityName, formId) {
+    Swal.fire({
+        title: '¿Estás completamente seguro?',
+        text: `Esta acción eliminará TODAS las entradas de ${entityName}. ¡Esta operación no se puede deshacer!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar todo',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'my-popup-class',
+            confirmButton: 'my-confirm-button',
+            cancelButton: 'my-cancel-button'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById(formId).submit();
         }
     });
 }

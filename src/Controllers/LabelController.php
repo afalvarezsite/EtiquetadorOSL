@@ -244,4 +244,15 @@ class LabelController extends Controller
             $ticketModel->updateName($_GET['modelId'], $_GET['modelName']);
         }
     }
+
+    public function clearPreview()
+    {
+        $filePath = __DIR__ . '/../../public/pdf/generado.pdf';
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'File not found']);
+        }
+    }
 }

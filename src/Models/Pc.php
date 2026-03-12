@@ -26,6 +26,18 @@ class Pc extends Model
         return $stmt->fetchColumn();
     }
 
+    public function countBios()
+    {
+        $stmt = $this->db->query("SELECT COUNT(*) AS total FROM {$this->table} WHERE board_type = 'bios'");
+        return $stmt->fetchColumn();
+    }
+
+    public function countUefi()
+    {
+        $stmt = $this->db->query("SELECT COUNT(*) AS total FROM {$this->table} WHERE board_type = 'uefi'");
+        return $stmt->fetchColumn();
+    }
+
     public function getTotalCount()
     {
         $stmt = $this->db->query("SELECT COUNT(*) FROM {$this->table}");
@@ -65,5 +77,17 @@ class Pc extends Model
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM model WHERE pc_id = ?");
         $stmt->execute([$id]);
         return $stmt->fetchColumn() > 0;
+    }
+
+    public function deleteAll()
+    {
+        try {
+            // Must clear sn_pc first due to foreign keys if not CASCADE
+            $this->db->exec("DELETE FROM sn_pc");
+            $stmt = $this->db->prepare("DELETE FROM {$this->table}");
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
     }
 }
