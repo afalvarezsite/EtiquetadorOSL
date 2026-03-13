@@ -130,19 +130,18 @@
                 </div>
 
                 <!-- Conectividad -->
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group connectivity-group">
                     <label>Conectividad:</label>
-                    <div style="display: flex; gap: 30px; align-items: center; margin-top: 10px; flex-wrap: wrap;">
+                    <div class="connectivity-grid">
                         <!-- Wi-Fi -->
-                        <div class="cntr" style="display: flex; align-items: center; gap: 10px;">
+                        <div class="cntr">
                             <input type="checkbox" id="wifi_cbx" name="wifi" value="true" class="hidden-xs-up cbx-input">
                             <label for="wifi_cbx" class="cbx"></label>
                             <span class="lbl">Wi-Fi</span>
                         </div>
                         <input type="hidden" name="wifi" value="false">
-
                         <!-- Bluetooth -->
-                        <div class="cntr" style="display: flex; align-items: center; gap: 10px;">
+                        <div class="cntr">
                             <input type="checkbox" id="blue_cbx" name="bluetooth" value="true" class="hidden-xs-up cbx-input">
                             <label for="blue_cbx" class="cbx"></label>
                             <span class="lbl">Bluetooth</span>
@@ -219,9 +218,11 @@
                                             Integrada
                                         <?php endif; ?>
                                     </td>
-                                    <td style="font-size: 13px;">
-                                        WiFi: <input type="checkbox" <?= $pc['wifi'] === 'true' ? 'checked' : '' ?> disabled><br>
-                                        BT: <input type="checkbox" <?= $pc['bluetooth'] === 'true' ? 'checked' : '' ?> disabled>
+                                    <td>
+                                        <div class="table-connectivity">
+                                            <span>WiFi: <input type="checkbox" <?= $pc['wifi'] === 'true' ? 'checked' : '' ?> disabled></span>
+                                            <span>BT: <input type="checkbox" <?= $pc['bluetooth'] === 'true' ? 'checked' : '' ?> disabled></span>
+                                        </div>
                                     </td>
                                     <td>
                                         <?= htmlspecialchars($pc['obser'] ?? '') ?>

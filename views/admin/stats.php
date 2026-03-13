@@ -10,59 +10,6 @@
     <title>Estadísticas de PCs</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .stats-grid canvas {
-            max-height: 300px;
-            width: 100% !important;
-        }
-
-        .config-section {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .items-selector {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        .item-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
-            padding: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .item-checkbox:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .item-checkbox input {
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .config-section {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body>

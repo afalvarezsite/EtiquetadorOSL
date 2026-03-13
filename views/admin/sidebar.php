@@ -14,32 +14,60 @@
 
 <div class="sidebar" id="admin-sidebar">
     <style>
+        .sidebar {
+            font-family: 'Tomorrow', sans-serif;
+        }
+        .sidebar h2 {
+            padding: 24px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px var(--accent-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
         .sidebar ul li a {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 20px;
-            transition: all 0.2s ease;
+            padding: 14px 24px;
+            transition: all 0.3s ease;
+            color: var(--general-color);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
         }
         .sidebar ul li a svg {
             flex-shrink: 0;
-            width: 20px;
-            height: 20px;
-            opacity: 0.8;
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        .sidebar ul li:hover a {
+            background: rgba(0, 255, 234, 0.05);
+            color: var(--accent-cyan);
+        }
+        .sidebar ul li:hover a svg {
+            opacity: 1;
+            filter: drop-shadow(0 0 5px var(--accent-cyan));
+        }
+        .sidebar ul li.active a {
+            background: rgba(0, 255, 234, 0.1);
+            color: var(--accent-cyan);
+            border-left: 4px solid var(--accent-cyan);
+            box-shadow: inset 4px 0 10px rgba(0, 255, 234, 0.1);
         }
         .sidebar ul li.active a svg {
             opacity: 1;
-        }
-        .sidebar h2 {
-            padding: 20px;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
         }
         .sidebar hr {
-            margin: 15px 20px;
+            margin: 20px 24px;
             border: 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
     </style>
     <h2>Panel de Admin</h2>

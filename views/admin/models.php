@@ -73,11 +73,9 @@
             <?php endif; ?>
         </div>
 
-        <div id="editModal" class="modal"
-            style="display:none; position:fixed; z-index:1000; inset:0; background:rgba(0,0,0,0.5);">
-            <div class="form" style="margin:10% auto; max-width:480px; border-radius:8px; position:relative;">
-                <span class="close"
-                    style="position:absolute; top:12px; right:16px; font-size:24px; cursor:pointer; color:var(--general-color);">&times;</span>
+        <div id="editModal" class="modal">
+            <div class="form">
+                <span class="close">&times;</span>
                 <h2>Editar Modelo</h2>
                 <form method="post" action="<?= BASE_URL ?>admin/models">
                     <input type="hidden" id="edit_id" name="id">
