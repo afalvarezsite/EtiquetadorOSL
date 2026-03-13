@@ -12,6 +12,7 @@ $router = new Router();
 // ===== RUTAS =====
 // Auth
 $router->get('/', 'AuthController', 'showLogin');
+$router->get('/login', 'AuthController', 'showLogin');
 $router->post('/login', 'AuthController', 'login');
 $router->get('/register', 'AuthController', 'showRegister');
 $router->post('/register', 'AuthController', 'register');

@@ -4,13 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Usuario - Panel de Acceso</title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <title>Registro - EtiquetadorOSL</title>
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
-    <div class="main-container">
-        <h1>Crear una cuenta</h1>
+<body class="dark">
+    <div class="auth-card">
+        <header class="auth-header">
+            <h1>Registro</h1>
+        </header>
 
         <?php if (!empty($errorMessage)): ?>
             <div class="alert alert-danger">
@@ -24,29 +27,31 @@
             </div>
         <?php endif; ?>
 
-        <form action="<?= BASE_URL ?>register" method="POST">
+        <form action="<?= BASE_URL ?>register" method="POST" class="auth-form">
             <div class="form-group">
-                <label for="username">Nombre de usuario:</label>
-                <input type="text" name="username" id="username" required
+                <label for="username">Nombre de usuario</label>
+                <input type="text" name="username" id="username" placeholder="Tu alias" required
                     value="<?= htmlspecialchars($username ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" required value="<?= htmlspecialchars($email ?? ''); ?>">
+                <label for="email">Email institucional</label>
+                <input type="email" name="email" id="email" placeholder="usuario@ejemplo.com" required 
+                    value="<?= htmlspecialchars($email ?? ''); ?>">
             </div>
             <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" name="password" id="password" required>
+                <label for="password">Contraseña</label>
+                <input type="password" name="password" id="password" placeholder="Mínimo 8 caracteres" required>
             </div>
             <div class="form-group">
-                <label for="confirm_password">Confirmar contraseña:</label>
-                <input type="password" name="confirm_password" id="confirm_password" required>
+                <label for="confirm_password">Confirmar contraseña</label>
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="Repite tu contraseña" required>
             </div>
-            <button type="submit">Registrarse</button>
+            <button type="submit" class="auth-submit">Crear Cuenta</button>
         </form>
-        <div style="text-align: center; margin-top: 20px;">
-            <p>¿Ya tienes una cuenta? <a href="<?= BASE_URL ?>login">Inicia sesión aquí</a></p>
-        </div>
+
+        <footer class="auth-footer">
+            <p>¿Ya tienes una cuenta? <a href="<?= BASE_URL ?>login">Inicia sesión</a></p>
+        </footer>
     </div>
 </body>
 
