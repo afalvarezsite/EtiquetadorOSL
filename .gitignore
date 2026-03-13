@@ -1,8 +1,32 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.aider*
+
+# Project specific
 public/pdf/finalraid/*
 public/pdf/qrcodes/*
 public/pdf/raid/*
-
 public/pdf/generado.pdf
-.aider*
+!public/pdf/.gitkeep
 
+# Certificates (sensitive data)
 certs/*
+!certs/.gitkeep
+
+# PHP & Composer
+vendor/
+.phpunit.result.cache
+
+# Docker
+.docker-build/
+
+# Logs
+*.log

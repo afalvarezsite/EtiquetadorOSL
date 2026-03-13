@@ -44,38 +44,45 @@ Ejecuta el perfil que mejor se adapte a tus necesidades de servidor web:
 
 **Para usar Nginx:**
 
+- **HTTP:** `http://localhost` (Puerto 80)
 - **HTTPS:** `https://localhost` (Puerto 443)
 
 ```bash
-docker compose --profile nginx up -d
+docker compose --profile nginx up -d --build
 ```
 
 **Para usar Apache:**
 
+- **HTTP:** `http://localhost:8081`
 - **HTTPS:** `https://localhost:8443`
 
 ```bash
-docker compose --profile apache up -d
+docker compose --profile apache up -d --build
 ```
+
+> [!NOTE]
+> Al acceder vía **HTTPS**, el navegador mostrará una advertencia de seguridad porque se utiliza un certificado SSL auto-firmado para desarrollo local. Puedes aceptarlo con seguridad para continuar.
 
 > [!TIP]
 > **Política de reinicio:** Por defecto, los contenedores usan `unless-stopped`. Para desarrollo, puedes usar `RESTART_POLICY=no`:
 >
 > ```bash
-> RESTART_POLICY=no docker compose --profile apache up -d
+> RESTART_POLICY=no docker compose --profile (apache/nginx) up -d --build
 > ```
 >
 > **PowerShell (Windows):** Si usas PowerShell, el comando para definir la variable es:
 >
 > ```powershell
-> $env:RESTART_POLICY="no"; docker compose --profile apache up -d
+> $env:RESTART_POLICY="no"; docker compose --profile (apache/nginx) up -d --build
 > ```
 
 ---
 
 ## Guía de Uso
 
-1. **Acceso:** Entra en la URL correspondiente (localhost:8080 o localhost:8081).
+1. **Acceso:** Entra en la URL correspondiente:
+   - **Nginx:** `http://localhost` o `https://localhost`
+   - **Apache:** `http://localhost:8081` o `https://localhost:8443`
 2. **Registro/Login:** Regístrate si es tu primera vez o inicia sesión.
 3. **2FA:** Introduce el código enviado a tu correo electrónico.
 4. **Etiquetado:** Rellena las características del equipo:
