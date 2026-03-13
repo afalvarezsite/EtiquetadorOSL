@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css" type="text/css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
 
     <title>Etiquetador OSL</title>
 </head>
@@ -20,12 +20,12 @@
     <section class="layout">
         <header class="header">
             <div class="logo-ugr">
-                <img src="<?= BASE_URL ?>assets/logo_UGR_horizontal.webp" class="logo-light-ugr">
-                <img src="<?= BASE_URL ?>assets/logo_UGR_horizontal_blanco.webp" class="logo-dark-ugr">
+                <img src="<?php echo $this->esc(BASE_URL); ?>assets/logo_UGR_horizontal.webp" class="logo-light-ugr">
+                <img src="<?php echo $this->esc(BASE_URL); ?>assets/logo_UGR_horizontal_blanco.webp" class="logo-dark-ugr">
             </div>
             <h1>Generador de Etiquetas</h1>
             <div class="logo-osl">
-                <img src="<?= BASE_URL ?>assets/osl_logo.webp">
+                <img src="<?php echo $this->esc(BASE_URL); ?>assets/osl_logo.webp">
             </div>
         </header>
         <div class="options">
@@ -49,7 +49,8 @@
             </button>
         </div>
         <div class="form">
-            <form action="<?= BASE_URL ?>generator/generate_pdf" method="post">
+            <form action="<?php echo $this->esc(BASE_URL); ?>generator/generate_pdf" method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="form-group">
                     <label for="board_type">Tipo de placa:</label>
                     <select name="board_type" id="board_type" required>
@@ -269,7 +270,7 @@
                     </svg>
                     Cambiar Tema
                 </button>
-                <a href="<?= BASE_URL ?>admin" class="footer-btn">
+                <a href="<?php echo $this->esc(BASE_URL); ?>admin" class="footer-btn">
                     <svg width="18" height="18" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor">
                         <path
@@ -277,7 +278,7 @@
                     </svg>
                     Panel administración
                 </a>
-                <a href="<?= BASE_URL ?>logout" class="footer-btn">
+                <a href="<?php echo $this->esc(BASE_URL); ?>logout" class="footer-btn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path

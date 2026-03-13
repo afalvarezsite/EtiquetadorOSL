@@ -9,8 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de GPUs</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -21,15 +21,16 @@
         <h1>Gestión de GPUs</h1>
 
         <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+            <div class="alert alert-danger"><?php echo $this->esc($errorMessage); ?></div>
         <?php endif; ?>
         <?php if (!empty($successMessage)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+            <div class="alert alert-success"><?php echo $this->esc($successMessage); ?></div>
         <?php endif; ?>
 
         <div class="card">
             <h2>Añadir Nueva GPU</h2>
-            <form method="post" action="<?= BASE_URL ?>admin/gpu">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/gpu">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="admin-form-row">
                     <input type="text" name="name" required placeholder="Nombre de la GPU">
                     <button type="submit" name="add" class="btn btn-primary">Añadir GPU</button>
@@ -43,7 +44,8 @@
             <p style="font-size: 0.9rem; margin-bottom: 15px; opacity: 0.8;">
                 Sube un archivo .txt (un nombre por línea) o .csv (primera columna). Los duplicados se omitirán.
             </p>
-            <form method="post" action="<?= BASE_URL ?>admin/gpu" enctype="multipart/form-data">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/gpu" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="drop-zone">
                     <span class="drop-zone__prompt">Arrastra tu archivo aquí o haz clic para subir</span>
                     <input type="file" name="import_file" class="drop-zone__input" accept=".csv,.txt" required>
@@ -55,7 +57,8 @@
         </div>
 
         <div class="card">
-            <form method="post" action="<?= BASE_URL ?>admin/gpu">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/gpu">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="admin-form-row">
                     <input type="search" name="pattern" placeholder="Buscar GPU..." autofocus>
                     <button type="submit" name="search" class="btn">Buscar</button>
@@ -80,12 +83,12 @@
                         <tbody>
                             <?php foreach ($gpus as $gpu): ?>
                                 <tr>
-                                    <td><?= (int) $gpu['id'] ?></td>
-                                    <td><?= htmlspecialchars($gpu['name']) ?></td>
+                                    <td><?php echo $this->esc((int) $gpu['id']); ?></td>
+                                    <td><?php echo $this->esc($gpu['name']); ?></td>
                                     <td class="actions">
                                         <button class="btn btn-edit"
-                                            onclick="editGPU(<?= $gpu['id'] ?>, '<?= htmlspecialchars($gpu['name'], ENT_QUOTES) ?>')">Editar</button>
-                                        <a href="<?= BASE_URL ?>admin/gpu?delete=<?= $gpu['id'] ?>" class="btn btn-delete"
+                                            onclick="editGPU(<?php echo $this->esc($gpu['id']); ?>, '<?php echo $this->esc($gpu['name']); ?>')">Editar</button>
+                                        <a href="<?php echo $this->esc(BASE_URL); ?>admin/gpu?delete=<?php echo $this->esc($gpu['id']); ?>" class="btn btn-delete"
                                             onclick="return confirm('¿Estás seguro de eliminar esta GPU?')">Eliminar</a>
                                     </td>
                                 </tr>
@@ -100,7 +103,8 @@
             <div class="form">
                 <span class="close">&times;</span>
                 <h2>Editar GPU</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/gpu">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/gpu">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_id" name="id">
                     <div class="form-group">
                         <label for="edit_name">Nombre:</label>
@@ -122,7 +126,8 @@
                     <div class="danger-zone-text">
                         <p>Las siguientes acciones son irreversibles. Por favor, procede con precaución.</p>
                     </div>
-                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/gpu" style="display:none;">
+                    <form id="deleteAllForm" method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/gpu" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                         <input type="hidden" name="deleteAll" value="1">
                     </form>
                     <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todas las GPUs', 'deleteAllForm')">
@@ -134,7 +139,7 @@
         <?php endif; ?>
     </div>
 
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
     <script>
         function editGPU(id, name) {
             document.getElementById('edit_id').value = id;

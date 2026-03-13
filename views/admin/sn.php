@@ -9,8 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Números de Serie</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -21,15 +21,16 @@
         <h1>Gestión de Números de Serie</h1>
 
         <?php if (!empty($successMessage)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+            <div class="alert alert-success"><?php echo $this->esc($successMessage); ?></div>
         <?php endif; ?>
         <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-error"><?= htmlspecialchars($errorMessage) ?></div>
+            <div class="alert alert-error"><?php echo $this->esc($errorMessage); ?></div>
         <?php endif; ?>
 
         <div class="card">
             <h2>Añadir Nuevo Prefijo SN</h2>
-            <form method="post" action="<?= BASE_URL ?>admin/sn">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/sn">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="admin-form-row">
                     <input type="text" name="prefix" required pattern="[A-Z]{3}" title="3 letras mayúsculas"
                         placeholder="Ej: PRU" maxlength="3" minlength="3" style="text-transform: uppercase;">
@@ -56,15 +57,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($sns as $sn): ?>
+                             <?php foreach ($sns as $sn): ?>
                                 <tr>
-                                    <td><?= (int) $sn['id'] ?></td>
-                                    <td><?= htmlspecialchars($sn['prefix']) ?></td>
-                                    <td><?= (int) $sn['num'] ?></td>
+                                    <td><?php echo $this->esc((int) $sn['id']); ?></td>
+                                    <td><?php echo $this->esc($sn['prefix']); ?></td>
+                                    <td><?php echo $this->esc((int) $sn['num']); ?></td>
                                     <td class="actions">
                                         <button class="btn btn-edit"
-                                            onclick="openEditModal(<?= (int) $sn['id'] ?>, '<?= htmlspecialchars($sn['prefix'], ENT_QUOTES) ?>')">Editar</button>
-                                        <a href="<?= BASE_URL ?>admin/sn?delete=<?= (int) $sn['id'] ?>" class="btn btn-delete"
+                                            onclick="openEditModal(<?php echo $this->esc((int) $sn['id']); ?>, '<?php echo $this->esc($sn['prefix']); ?>')">Editar</button>
+                                        <a href="<?php echo $this->esc(BASE_URL); ?>admin/sn?delete=<?php echo $this->esc((int) $sn['id']); ?>" class="btn btn-delete"
                                             onclick="return confirm('¿Está seguro que desea eliminar este prefijo SN?')">Eliminar</a>
                                     </td>
                                 </tr>
@@ -79,7 +80,8 @@
             <div class="form">
                 <span class="close">&times;</span>
                 <h2>Editar Prefijo SN</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/sn">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/sn">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_id" name="id">
                     <div class="form-group">
                         <label for="edit_prefix">Prefijo:</label>
@@ -102,7 +104,8 @@
                     <div class="danger-zone-text">
                         <p>Las siguientes acciones son irreversibles. Por favor, procede con precaución.</p>
                     </div>
-                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/sn" style="display:none;">
+                    <form id="deleteAllForm" method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/sn" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                         <input type="hidden" name="deleteAll" value="1">
                     </form>
                     <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todos los prefijos SN', 'deleteAllForm')">
@@ -114,7 +117,7 @@
         <?php endif; ?>
     </div>
 
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
     <script>
         function openEditModal(id, prefix) {
             document.getElementById('edit_id').value = id;

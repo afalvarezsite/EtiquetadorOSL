@@ -9,8 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Modelos</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -21,15 +21,16 @@
         <h1>Gestión de Modelos de Etiqueta</h1>
 
         <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+            <div class="alert alert-danger"><?php echo $this->esc($errorMessage); ?></div>
         <?php endif; ?>
         <?php if (!empty($successMessage)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+            <div class="alert alert-success"><?php echo $this->esc($successMessage); ?></div>
         <?php endif; ?>
 
         <div class="card">
             <h2>Añadir Nuevo Modelo</h2>
-            <form method="post" action="<?= BASE_URL ?>admin/models">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/models">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="admin-form-row">
                     <input type="text" name="name" required placeholder="Nombre del Modelo">
                     <button type="submit" name="add" class="btn btn-primary">Añadir</button>
@@ -55,15 +56,15 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($models as $model): ?>
+                             <?php foreach ($models as $model): ?>
                                 <tr>
-                                    <td><?= (int) $model['id'] ?></td>
-                                    <td><?= htmlspecialchars($model['name']) ?></td>
-                                    <td><?= htmlspecialchars($model['model'] ?? '—') ?></td>
+                                    <td><?php echo $this->esc((int) $model['id']); ?></td>
+                                    <td><?php echo $this->esc($model['name']); ?></td>
+                                    <td><?php echo $this->esc($model['model'] ?? '—'); ?></td>
                                     <td class="actions">
                                         <button class="btn btn-edit"
-                                            onclick="editModel(<?= $model['id'] ?>, '<?= htmlspecialchars($model['name'], ENT_QUOTES) ?>')">Editar</button>
-                                        <a href="<?= BASE_URL ?>admin/models?delete=<?= $model['id'] ?>" class="btn btn-delete"
+                                            onclick="editModel(<?php echo $this->esc($model['id']); ?>, '<?php echo $this->esc($model['name']); ?>')">Editar</button>
+                                        <a href="<?php echo $this->esc(BASE_URL); ?>admin/models?delete=<?php echo $this->esc($model['id']); ?>" class="btn btn-delete"
                                             onclick="return confirm('¿Estás seguro de eliminar este Modelo?')">Eliminar</a>
                                     </td>
                                 </tr>
@@ -78,7 +79,8 @@
             <div class="form">
                 <span class="close">&times;</span>
                 <h2>Editar Modelo</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/models">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/models">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_id" name="id">
                     <div class="form-group">
                         <label for="edit_name">Nombre:</label>
@@ -100,7 +102,8 @@
                     <div class="danger-zone-text">
                         <p>Las siguientes acciones son irreversibles. Por favor, procede con precaución.</p>
                     </div>
-                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/models" style="display:none;">
+                    <form id="deleteAllForm" method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/models" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                         <input type="hidden" name="deleteAll" value="1">
                     </form>
                     <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todos los modelos', 'deleteAllForm')">
@@ -112,7 +115,7 @@
         <?php endif; ?>
     </div>
 
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
     <script>
         function editModel(id, name) {
             document.getElementById('edit_id').value = id;

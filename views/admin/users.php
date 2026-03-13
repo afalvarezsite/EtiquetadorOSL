@@ -9,8 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Usuarios</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -21,15 +21,16 @@
         <h1>Gestión de Usuarios</h1>
 
         <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($errorMessage) ?></div>
+            <div class="alert alert-danger"><?php echo $this->esc($errorMessage); ?></div>
         <?php endif; ?>
         <?php if (!empty($successMessage)): ?>
-            <div class="alert alert-success"><?= htmlspecialchars($successMessage) ?></div>
+            <div class="alert alert-success"><?php echo $this->esc($successMessage); ?></div>
         <?php endif; ?>
 
         <div class="card">
             <h2>Añadir Nuevo Usuario</h2>
-            <form method="post" action="<?= BASE_URL ?>admin/users">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/users">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end;">
                     <div class="form-group" style="margin:0">
                         <label>Usuario:</label>
@@ -70,24 +71,24 @@
                         <tbody>
                             <?php foreach ($users as $user): ?>
                                 <tr>
-                                    <td><?= (int) $user['id'] ?></td>
-                                    <td><?= htmlspecialchars($user['username']) ?></td>
-                                    <td><?= htmlspecialchars($user['rol_name'] ?? 'Usuario') ?></td>
-                                    <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars($user['created_at']) ?></td>
+                                    <td><?php echo $this->esc((int) $user['id']); ?></td>
+                                    <td><?php echo $this->esc($user['username']); ?></td>
+                                    <td><?php echo $this->esc($user['rol_name'] ?? 'Usuario'); ?></td>
+                                    <td><?php echo $this->esc($user['email']); ?></td>
+                                    <td><?php echo $this->esc($user['created_at']); ?></td>
                                     <td class="actions">
                                         <button class="btn btn-edit"
-                                            onclick="openEditPasswordModal(<?= (int) $user['id'] ?>, '<?= htmlspecialchars($user['username'], ENT_QUOTES) ?>')">Contraseña</button>
+                                            onclick="openEditPasswordModal(<?php echo $this->esc((int) $user['id']); ?>, '<?php echo $this->esc($user['username']); ?>')">Contraseña</button>
                                         <button class="btn btn-edit"
-                                            onclick="openEditEmailModal(<?= (int) $user['id'] ?>, '<?= htmlspecialchars($user['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($user['email'], ENT_QUOTES) ?>')">Email</button>
+                                            onclick="openEditEmailModal(<?php echo $this->esc((int) $user['id']); ?>, '<?php echo $this->esc($user['username']); ?>', '<?php echo $this->esc($user['email']); ?>')">Email</button>
                                         <button class="btn btn-edit"
-                                            onclick="openEditRoleModal(<?= (int) $user['id'] ?>, '<?= htmlspecialchars($user['username'], ENT_QUOTES) ?>', <?= (int) $user['role_id'] ?>)">Rol</button>
-                                        <a href="<?= BASE_URL ?>admin/users?delete=<?= (int) $user['id'] ?>"
+                                            onclick="openEditRoleModal(<?php echo $this->esc((int) $user['id']); ?>, '<?php echo $this->esc($user['username']); ?>', <?php echo $this->esc((int) $user['role_id']); ?>)">Rol</button>
+                                        <a href="<?php echo $this->esc(BASE_URL); ?>admin/users?delete=<?php echo $this->esc((int) $user['id']); ?>"
                                             class="btn btn-delete"
                                             onclick="return confirm('¿Está seguro que desea eliminar este usuario?')">Eliminar</a>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endforeach; ?>each; ?>
                         </tbody>
                     </table>
                 </div>
@@ -99,7 +100,8 @@
             <div class="form">
                 <span class="close" data-modal="editPasswordModal">&times;</span>
                 <h2>Cambiar Contraseña</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/users">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/users">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_password_user_id" name="userId">
                     <div class="form-group">
                         <label>Usuario:</label>
@@ -119,7 +121,8 @@
             <div class="form">
                 <span class="close" data-modal="editEmailModal">&times;</span>
                 <h2>Cambiar Email</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/users">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/users">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_email_user_id" name="userId">
                     <div class="form-group">
                         <label>Usuario:</label>
@@ -139,7 +142,8 @@
             <div class="form">
                 <span class="close" data-modal="editRoleModal">&times;</span>
                 <h2>Cambiar Rol</h2>
-                <form method="post" action="<?= BASE_URL ?>admin/users">
+                <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/users">
+                    <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                     <input type="hidden" id="edit_role_user_id" name="userId">
                     <div class="form-group">
                         <label>Usuario:</label>
@@ -169,7 +173,8 @@
                     <div class="danger-zone-text">
                         <p>Las siguientes acciones son irreversibles. No podrás borrar tu propia cuenta administrativa.</p>
                     </div>
-                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/users" style="display:none;">
+                    <form id="deleteAllForm" method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/users" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                         <input type="hidden" name="deleteAll" value="1">
                     </form>
                     <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todos los usuarios (excepto tú)', 'deleteAllForm')">
@@ -181,7 +186,7 @@
         <?php endif; ?>
     </div>
 
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
     <script>
         function openEditPasswordModal(userId, username) {
             document.getElementById('edit_password_user_id').value = userId;

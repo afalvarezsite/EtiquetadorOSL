@@ -12,9 +12,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de PCs</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
     <!-- Use base URL for assets -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -26,20 +26,21 @@
 
         <?php if (!empty($errorMessage)): ?>
             <div class="alert alert-error">
-                <?= htmlspecialchars($errorMessage) ?>
+                <?php echo $this->esc($errorMessage); ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($successMessage)): ?>
             <div class="alert alert-success">
-                <?= htmlspecialchars($successMessage) ?>
+                <?php echo $this->esc($successMessage); ?>
             </div>
         <?php endif; ?>
 
         <!-- Añadir PC -->
         <div class="card">
             <h2>Añadir Nueva PC (No crea una etiqueta)</h2>
-            <form method="post" action="<?= BASE_URL ?>admin/pc" id="pcForm">
+            <form method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/pc" id="pcForm">
+                <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                 <div class="form-grid">
                     <!-- Columna 1 -->
                     <div>
@@ -56,8 +57,8 @@
                             <select name="cpu_name" required>
                                 <option value="">Seleccionar CPU</option>
                                 <?php foreach ($cpus as $cpu): ?>
-                                    <option value="<?= $cpu['id'] ?>">
-                                        <?= htmlspecialchars($cpu['name']) ?>
+                                    <option value="<?php echo $this->esc($cpu['id']); ?>">
+                                        <?php echo $this->esc($cpu['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -68,8 +69,8 @@
                             <select name="ram_capacity" required>
                                 <option value="">Seleccionar Capacidad</option>
                                 <?php foreach ($rams as $ram): ?>
-                                    <option value="<?= $ram['id'] ?>">
-                                        <?= (int) $ram['capacity'] ?>GB
+                                    <option value="<?php echo $this->esc($ram['id']); ?>">
+                                        <?php echo $this->esc((int) $ram['capacity']); ?>GB
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -92,8 +93,8 @@
                             <select name="disc_capacity" required>
                                 <option value="">Seleccionar Capacidad</option>
                                 <?php foreach ($discs as $disc): ?>
-                                    <option value="<?= $disc['id'] ?>">
-                                        <?= (int) $disc['capacity'] ?>GB
+                                    <option value="<?php echo $this->esc($disc['id']); ?>">
+                                        <?php echo $this->esc((int) $disc['capacity']); ?>GB
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -113,8 +114,8 @@
                             <select name="gpu_name">
                                 <option value="">Integrada (Ninguna)</option>
                                 <?php foreach ($gpus as $gpu): ?>
-                                    <option value="<?= $gpu['id'] ?>">
-                                        <?= htmlspecialchars($gpu['name']) ?>
+                                    <option value="<?php echo $this->esc($gpu['id']); ?>">
+                                        <?php echo $this->esc($gpu['name']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -184,56 +185,55 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($pcs as $pc): ?>
+                                                     <?php foreach ($pcs as $pc): ?>
                                 <tr>
                                     <td>
-                                        <?= (int) $pc['id'] ?>
+                                        <?php echo $this->esc((int) $pc['id']); ?>
                                     </td>
                                     <td>
                                         <?php if ($pc['sn_prefix']): ?>
-                                            <?= htmlspecialchars($pc['sn_prefix'] . "-" . str_pad($pc['sn_num'], 4, '0', STR_PAD_LEFT)) ?>
+                                            <?php echo $this->esc($pc['sn_prefix'] . "-" . str_pad($pc['sn_num'], 4, '0', STR_PAD_LEFT)); ?>
                                         <?php else: ?>
                                             <span style="color: var(--radio-red);">Sin SN</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?= htmlspecialchars(strtoupper($pc['board_type'])) ?>
+                                        <?php echo $this->esc(strtoupper($pc['board_type'])); ?>
                                     </td>
                                     <td>
-                                        <?= htmlspecialchars($pc['cpu_name_text'] ?? 'Sin CPU') ?>
+                                        <?php echo $this->esc($pc['cpu_name_text'] ?? 'Sin CPU'); ?>
                                     </td>
                                     <td>
-                                        <?= $pc['ram_capacity_text'] ? (int) $pc['ram_capacity_text'] . 'GB ' : '' ?>
-                                        <?= htmlspecialchars($pc['ram_type'] ?? '') ?>
+                                        <?php echo $this->esc($pc['ram_capacity_text'] ? (int) $pc['ram_capacity_text'] . 'GB ' : ''); ?>
+                                        <?php echo $this->esc($pc['ram_type'] ?? ''); ?>
                                     </td>
                                     <td>
-                                        <?= $pc['disc_capacity_text'] ? (int) $pc['disc_capacity_text'] . 'GB ' : '' ?>
-                                        <?= htmlspecialchars($pc['disc_type'] ?? '') ?>
+                                        <?php echo $this->esc($pc['disc_capacity_text'] ? (int) $pc['disc_capacity_text'] . 'GB ' : ''); ?>
+                                        <?php echo $this->esc($pc['disc_type'] ?? ''); ?>
                                     </td>
                                     <td>
                                         <?php if ($pc['gpu_name_text']): ?>
-                                            <?= htmlspecialchars($pc['gpu_name_text'] ?? '') ?>
-                                            (<?= htmlspecialchars($pc['gpu_type'] ?? '') ?>)
+                                            <?php echo $this->esc($pc['gpu_name_text'] ?? ''); ?>
+                                            (<?php echo $this->esc($pc['gpu_type'] ?? ''); ?>)
                                         <?php else: ?>
                                             Integrada
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <div class="table-connectivity">
-                                            <span>WiFi: <input type="checkbox" <?= $pc['wifi'] === 'true' ? 'checked' : '' ?> disabled></span>
-                                            <span>BT: <input type="checkbox" <?= $pc['bluetooth'] === 'true' ? 'checked' : '' ?> disabled></span>
+                                            <span>WiFi: <input type="checkbox" <?php echo ($pc['wifi'] === 'true' ? 'checked' : ''); ?> disabled></span>
+                                            <span>BT: <input type="checkbox" <?php echo ($pc['bluetooth'] === 'true' ? 'checked' : ''); ?> disabled></span>
                                         </div>
                                     </td>
                                     <td>
-                                        <?= htmlspecialchars($pc['obser'] ?? '') ?>
+                                        <?php echo $this->esc($pc['obser'] ?? ''); ?>
                                     </td>
                                     <td class="actions">
-                                        <a href="<?= BASE_URL ?>admin/pc?delete=<?= $pc['id'] ?>" class="btn btn-delete"
+                                        <a href="<?php echo $this->esc(BASE_URL); ?>admin/pc?delete=<?php echo $this->esc($pc['id']); ?>" class="btn btn-delete"
                                             onclick="return confirm('¿Estás seguro de eliminar esta PC?')">Eliminar</a>
                                     </td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endforeach; ?>foreach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -251,7 +251,8 @@
                     <div class="danger-zone-text">
                         <p>Las siguientes acciones son irreversibles. Por favor, procede con precaución.</p>
                     </div>
-                    <form id="deleteAllForm" method="post" action="<?= BASE_URL ?>admin/pc" style="display:none;">
+                    <form id="deleteAllForm" method="post" action="<?php echo $this->esc(BASE_URL); ?>admin/pc" style="display:none;">
+                        <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
                         <input type="hidden" name="deleteAll" value="1">
                     </form>
                     <button type="button" class="btn-danger-premium" onclick="confirmMassDeletion('todas las PCs', 'deleteAllForm')">
@@ -263,7 +264,7 @@
         <?php endif; ?>
     </div>
 
-    <script src="<?= BASE_URL ?>assets/js/script.js"></script>
+    <script src="<?php echo $this->esc(BASE_URL); ?>assets/js/script.js"></script>
     <script>
         // Handle messages timeout
         setTimeout(() => {

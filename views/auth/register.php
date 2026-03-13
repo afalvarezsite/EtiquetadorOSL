@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Etiquetador OSL</title>
-    <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
-    <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
+    <link rel="icon" type="image/jpg" href="<?php echo $this->esc(BASE_URL); ?>assets/favicon.ico" />
+    <link rel="stylesheet" href="<?php echo $this->esc(BASE_URL); ?>assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Tomorrow:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 
@@ -18,26 +18,27 @@
 
         <?php if (!empty($errorMessage)): ?>
             <div class="alert alert-danger">
-                <?= htmlspecialchars($errorMessage); ?>
+                <?php echo $this->esc($errorMessage); ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($successMessage)): ?>
             <div class="alert alert-success">
-                <?= htmlspecialchars($successMessage); ?>
+                <?php echo $this->esc($successMessage); ?>
             </div>
         <?php endif; ?>
 
-        <form action="<?= BASE_URL ?>register" method="POST" class="auth-form">
+        <form action="<?php echo $this->esc(BASE_URL); ?>register" method="POST" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?php echo $this->esc($csrf_token); ?>">
             <div class="form-group">
                 <label for="username">Nombre de usuario</label>
                 <input type="text" name="username" id="username" placeholder="Tu alias" required
-                    value="<?= htmlspecialchars($username ?? ''); ?>">
+                    value="<?php echo $this->esc($username ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="email">Email institucional</label>
                 <input type="email" name="email" id="email" placeholder="usuario@ejemplo.com" required 
-                    value="<?= htmlspecialchars($email ?? ''); ?>">
+                    value="<?php echo $this->esc($email ?? ''); ?>">
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
@@ -51,7 +52,7 @@
         </form>
 
         <footer class="auth-footer">
-            <p>¿Ya tienes una cuenta? <a href="<?= BASE_URL ?>login">Inicia sesión</a></p>
+            <p>¿Ya tienes una cuenta? <a href="<?php echo $this->esc(BASE_URL); ?>login">Inicia sesión</a></p>
         </footer>
     </div>
 </body>
