@@ -74,7 +74,7 @@ class Pc extends Model
 
     public function isUsedInModel($id)
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM model WHERE pc_id = ?");
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM models WHERE model = ?");
         $stmt->execute([$id]);
         return $stmt->fetchColumn() > 0;
     }
