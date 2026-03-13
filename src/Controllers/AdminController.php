@@ -32,7 +32,6 @@ class AdminController extends Controller
         $this->render('admin/dashboard', $data);
     }
 
-    // Otras vistas de admin (cpu, gpu, etc.) se pueden mapear de igual forma iterativamente
     public function cpu()
     {
         $cpuModel = new \App\Models\Cpu();
@@ -55,6 +54,8 @@ class AdminController extends Controller
 
         // Handle Add, Edit, Search, Import
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
+
             if (isset($_POST['add'])) {
                 $name = trim($_POST['name']);
                 if (!empty($name)) {
@@ -84,11 +85,17 @@ class AdminController extends Controller
             } elseif (isset($_POST['import'])) {
                 if (isset($_FILES['import_file']) && $_FILES['import_file']['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES['import_file']['tmp_name'];
-                    $ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+
+                    // <-- VALIDACIÓN MIME SEGURA (Path Traversal mitigado)
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mime = finfo_file($finfo, $file);
+                    finfo_close($finfo);
+
                     $addedCount = 0;
                     $skippedCount = 0;
+                    $csvMimes = ['text/csv', 'application/csv', 'application/vnd.ms-excel'];
 
-                    if ($ext === 'csv') {
+                    if (in_array($mime, $csvMimes)) {
                         if (($handle = fopen($file, "r")) !== FALSE) {
                             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                                 $name = trim($data[0]);
@@ -103,7 +110,7 @@ class AdminController extends Controller
                             }
                             fclose($handle);
                         }
-                    } else {
+                    } elseif ($mime === 'text/plain') {
                         $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                         foreach ($lines as $line) {
                             $name = trim($line);
@@ -116,8 +123,13 @@ class AdminController extends Controller
                                 }
                             }
                         }
+                    } else {
+                        $errorMessage = "Tipo de archivo no permitido. Solo se admiten archivos CSV o TXT.";
                     }
-                    $this->redirect("admin/cpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+
+                    if (empty($errorMessage)) {
+                        $this->redirect("admin/cpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+                    }
                 }
             } elseif (isset($_POST['deleteAll'])) {
                 if ($cpuModel->deleteAll()) {
@@ -159,6 +171,7 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage
         ]);
     }
+
     public function gpu()
     {
         $gpuModel = new \App\Models\Gpu();
@@ -181,6 +194,8 @@ class AdminController extends Controller
 
         // Handle Add, Edit, Search, Import
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
+
             if (isset($_POST['add'])) {
                 $name = trim($_POST['name']);
                 if (!empty($name)) {
@@ -210,11 +225,17 @@ class AdminController extends Controller
             } elseif (isset($_POST['import'])) {
                 if (isset($_FILES['import_file']) && $_FILES['import_file']['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES['import_file']['tmp_name'];
-                    $ext = pathinfo($_FILES['import_file']['name'], PATHINFO_EXTENSION);
+
+                    // <-- VALIDACIÓN MIME SEGURA
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mime = finfo_file($finfo, $file);
+                    finfo_close($finfo);
+
                     $addedCount = 0;
                     $skippedCount = 0;
+                    $csvMimes = ['text/csv', 'application/csv', 'application/vnd.ms-excel'];
 
-                    if ($ext === 'csv') {
+                    if (in_array($mime, $csvMimes)) {
                         if (($handle = fopen($file, "r")) !== FALSE) {
                             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                                 $name = trim($data[0]);
@@ -229,7 +250,7 @@ class AdminController extends Controller
                             }
                             fclose($handle);
                         }
-                    } else {
+                    } elseif ($mime === 'text/plain') {
                         $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                         foreach ($lines as $line) {
                             $name = trim($line);
@@ -242,8 +263,13 @@ class AdminController extends Controller
                                 }
                             }
                         }
+                    } else {
+                        $errorMessage = "Tipo de archivo no permitido. Solo se admiten archivos CSV o TXT.";
                     }
-                    $this->redirect("admin/gpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+
+                    if (empty($errorMessage)) {
+                        $this->redirect("admin/gpu?msg=imported&added=$addedCount&skipped=$skippedCount");
+                    }
                 }
             } elseif (isset($_POST['deleteAll'])) {
                 if ($gpuModel->deleteAll()) {
@@ -285,11 +311,10 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage
         ]);
     }
+
     public function pc()
     {
         $pcModel = new \App\Models\Pc();
-
-        // Models for selects
         $cpuModel = new \App\Models\Cpu();
         $ramModel = new \App\Models\Ram();
         $discModel = new \App\Models\Disc();
@@ -312,38 +337,37 @@ class AdminController extends Controller
             }
         }
 
-        // Handle Add
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
-            $board_type = $_POST['board_type'];
-            $cpu_name = $_POST['cpu_name'];
-            $ram_capacity = $_POST['ram_capacity'];
-            $ram_type = $_POST['ram_type'];
-            $disc_capacity = $_POST['disc_capacity'];
-            $disc_type = $_POST['disc_type'];
-            $gpu_name = !empty($_POST['gpu_name']) ? $_POST['gpu_name'] : null;
-            $gpu_type = $_POST['gpu_type'];
-            $wifi = $_POST['wifi'];
-            $bluetooth = $_POST['bluetooth'];
-            $obser = $_POST['obser'];
-            // Notice: description is now part of obser in the db schema, or left out if not in schema. Taking from pc.php:
-            // $description = $_POST['description']; // In legacy pc.php it was passed but the db might not support it. We'll pass it to obser or ignore.
-            $description = isset($_POST['description']) ? $_POST['description'] : '';
+        // Handle Add and DeleteAll
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
 
-            // Using the existing create method: create($board_type, $cpu, $ram_capacity, $ram_type, $disc_capacity, $disc_type, $gpu, $gpu_type, $wifi, $bluetooth, $sn, $observaciones)
-            // SN is not generated at PC creation time, it's done during label generation or linked separately. Passing null or 0 for SN.
-            // Description might be mapped to 'observaciones' based on PC model definition.
-            $full_obser = $obser . (!empty($description) ? "\n" . $description : "");
+            if (isset($_POST['add'])) {
+                $board_type = $_POST['board_type'];
+                $cpu_name = $_POST['cpu_name'];
+                $ram_capacity = $_POST['ram_capacity'];
+                $ram_type = $_POST['ram_type'];
+                $disc_capacity = $_POST['disc_capacity'];
+                $disc_type = $_POST['disc_type'];
+                $gpu_name = !empty($_POST['gpu_name']) ? $_POST['gpu_name'] : null;
+                $gpu_type = $_POST['gpu_type'];
+                $wifi = $_POST['wifi'];
+                $bluetooth = $_POST['bluetooth'];
+                $obser = $_POST['obser'];
+                $description = isset($_POST['description']) ? $_POST['description'] : '';
 
-            if ($pcModel->create($board_type, $cpu_name, $ram_capacity, $ram_type, $disc_capacity, $disc_type, $gpu_name, $gpu_type, $wifi, $bluetooth, $obser)) {
-                $this->redirect('admin/pc?msg=added');
-            } else {
-                $errorMessage = "Error al añadir PC.";
-            }
-        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deleteAll'])) {
-            if ($pcModel->deleteAll()) {
-                $this->redirect('admin/pc?msg=all_deleted');
-            } else {
-                $errorMessage = "Error al eliminar todas las PCs.";
+                $full_obser = $obser . (!empty($description) ? "\n" . $description : "");
+
+                if ($pcModel->create($board_type, $cpu_name, $ram_capacity, $ram_type, $disc_capacity, $disc_type, $gpu_name, $gpu_type, $wifi, $bluetooth, $obser)) {
+                    $this->redirect('admin/pc?msg=added');
+                } else {
+                    $errorMessage = "Error al añadir PC.";
+                }
+            } elseif (isset($_POST['deleteAll'])) {
+                if ($pcModel->deleteAll()) {
+                    $this->redirect('admin/pc?msg=all_deleted');
+                } else {
+                    $errorMessage = "Error al eliminar todas las PCs.";
+                }
             }
         }
 
@@ -365,7 +389,9 @@ class AdminController extends Controller
             $gpus = $gpuModel->getAll();
             $pcs = $pcModel->getAllWithDetails();
         } catch (\Exception $e) {
-            $errorMessage = "Error al cargar componentes: " . $e->getMessage();
+            // <-- MITIGACIÓN DE FUGA DE INFORMACIÓN (Logs seguros)
+            error_log("Error BD al cargar componentes PC: " . $e->getMessage());
+            $errorMessage = "Ocurrió un error interno al cargar los componentes. Por favor, intente de nuevo.";
             $pcs = [];
         }
 
@@ -379,6 +405,7 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage
         ]);
     }
+
     public function sn()
     {
         $snModel = new \App\Models\Sn();
@@ -397,10 +424,11 @@ class AdminController extends Controller
 
         // Handle Add & Edit
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
+
             if (isset($_POST['add'])) {
                 $prefix = trim($_POST['prefix']);
                 if (!empty($prefix)) {
-                    // Requires setting num=0 in DB for new prefixes
                     if ($snModel->createWithNum($prefix, 0)) {
                         $this->redirect('admin/sn?msg=added');
                     } else {
@@ -426,7 +454,6 @@ class AdminController extends Controller
             }
         }
 
-        // Messages from redirect
         if (isset($_GET['msg'])) {
             if ($_GET['msg'] === 'deleted')
                 $successMessage = "Prefijo SN eliminado correctamente.";
@@ -446,6 +473,7 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage
         ]);
     }
+
     public function models()
     {
         $model = new \App\Models\TicketModel();
@@ -464,18 +492,11 @@ class AdminController extends Controller
 
         // Handle Add, Edit
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
+
             if (isset($_POST['add'])) {
                 $name = trim($_POST['name']);
                 if (!empty($name)) {
-                    // Create minimal model just with the name as in legacy models.php
-                    // Wait, the new `create()` method in `TicketModel.php` requires all the PC attributes: 
-                    // `create($name, $board_type, $cpu, $cpu_other, $ram_capacity, $ram_other, $ram_type, $disc_capacity, $disc_other, $disc_type, $gpu, $gpu_other, $gpu_type, $wifi, $bluetooth, $sn, $sn_other, $observaciones)`
-                    // Let's create a simpler method just for adding the name or supply nulls. The legacy only asked for Name.
-                    // Actually, the legacy code from 'models.php' has: "Añadir Nueva Modelo" -> only form field is "name".
-                    // But wait, the `models` table has `model` as an attribute too (based on the index listing).
-                    // Let me check my method `create` in TicketModel. It was adapted from ticket generation. 
-                    // The pure `Model` entity might need an add method just for name.
-                    // I'll supply empty strings to the required fields for now to match the legacy behavior.
                     if ($model->create($name, '', '', '', '', '', '', '', '', '', '', '', '', 'false', 'false', '', '', '')) {
                         $this->redirect('admin/models?msg=added');
                     } else {
@@ -505,7 +526,6 @@ class AdminController extends Controller
             }
         }
 
-        // Handle Messages
         if (isset($_GET['msg'])) {
             if ($_GET['msg'] === 'deleted')
                 $successMessage = "Modelo eliminado correctamente.";
@@ -517,11 +537,12 @@ class AdminController extends Controller
                 $successMessage = "Todos los modelos han sido eliminados.";
         }
 
-        // Fetch Data
         try {
             $models = $model->getAll();
         } catch (\Exception $e) {
-            $errorMessage = "Error al cargar modelos: " . $e->getMessage();
+            // <-- MITIGACIÓN DE FUGA DE INFORMACIÓN
+            error_log("Error BD al cargar modelos: " . $e->getMessage());
+            $errorMessage = "Error interno al cargar la lista de modelos.";
             $models = [];
         }
 
@@ -531,6 +552,7 @@ class AdminController extends Controller
             'errorMessage' => $errorMessage
         ]);
     }
+
     public function users()
     {
         $userModel = new \App\Models\User();
@@ -553,6 +575,8 @@ class AdminController extends Controller
 
         // Handle POST actions
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF APLICADA
+
             if (isset($_POST['add'])) {
                 $username = trim($_POST['username']);
                 $password = $_POST['password'];
@@ -562,7 +586,6 @@ class AdminController extends Controller
                     $errorMessage = "Por favor, complete todos los campos.";
                 } else {
                     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-                    // Standard user role is 2 by default
                     if ($userModel->create($username, $email, $passwordHash, 2)) {
                         $this->redirect('admin/users?msg=added');
                     } else {
@@ -594,7 +617,7 @@ class AdminController extends Controller
                         $errorMessage = "Error al cambiar el correo electrónico.";
                     }
                 }
-            } elseif (isset($_POST['updaterole'])) { // Addition: inline role change logic inside users controller instead of separate file like edit_role.php
+            } elseif (isset($_POST['updaterole'])) {
                 $userId = (int) $_POST['userId'];
                 $roleId = (int) $_POST['role_id'];
                 if ($userModel->updateRole($userId, $roleId)) {
@@ -603,7 +626,7 @@ class AdminController extends Controller
                     $errorMessage = "Error al cambiar el rol.";
                 }
             } elseif (isset($_POST['deleteAll'])) {
-                if ($userModel->deleteAll($_SESSION['user_id'])) {
+                if ($userModel->deleteAll($_SESSION['user_id'] ?? 0)) {
                     $this->redirect('admin/users?msg=all_deleted');
                 } else {
                     $errorMessage = "Error al eliminar usuarios.";
@@ -611,7 +634,6 @@ class AdminController extends Controller
             }
         }
 
-        // Handle Messages
         if (isset($_GET['msg'])) {
             if ($_GET['msg'] === 'deleted')
                 $successMessage = "Usuario eliminado correctamente.";
@@ -627,12 +649,13 @@ class AdminController extends Controller
                 $successMessage = "Todos los usuarios (excepto tú) han sido eliminados.";
         }
 
-        // Fetch Data
         try {
             $users = $userModel->getAllWithRoles();
             $roles = $userModel->getRoles();
         } catch (\Exception $e) {
-            $errorMessage = "Error al cargar usuarios: " . $e->getMessage();
+            // <-- MITIGACIÓN DE FUGA DE INFORMACIÓN
+            error_log("Error BD al cargar usuarios: " . $e->getMessage());
+            $errorMessage = "Error interno al cargar la lista de usuarios.";
             $users = [];
             $roles = [];
         }
@@ -741,9 +764,10 @@ class AdminController extends Controller
             ]);
         } catch (\Exception $e) {
             http_response_code(500);
-            echo json_encode(['error' => $e->getMessage()]);
+            // <-- MITIGACIÓN DE FUGA DE INFORMACIÓN EN API
+            error_log("Error BD en statsJson: " . $e->getMessage());
+            echo json_encode(['error' => 'Error interno procesando las estadísticas.']);
         }
         exit;
     }
 }
-

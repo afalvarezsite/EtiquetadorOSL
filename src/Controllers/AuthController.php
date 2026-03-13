@@ -7,7 +7,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-
     public function showLogin()
     {
         if (isset($_SESSION['usuario_id'])) {
@@ -19,15 +18,18 @@ class AuthController extends Controller
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF AÑADIDA
+
             $username = trim($_POST['username'] ?? '');
             $password = trim($_POST['password'] ?? '');
 
             $userModel = new User();
             $user = $userModel->findByUsernameOrEmail($username);
 
-            // Valida con username o email
-            // En el código original se usa password_verify
             if ($user && password_verify($password, $user['password'])) {
+                // <-- PROTECCIÓN CONTRA FIJACIÓN DE SESIÓN AÑADIDA
+                session_regenerate_id(true);
+
                 $_SESSION['usuario_id'] = $user['id'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['rol'] = $user['rol'];
@@ -49,22 +51,26 @@ class AuthController extends Controller
     public function register()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->verifyCsrfToken(); // <-- PROTECCIÓN CSRF AÑADIDA
+
             $email = trim($_POST['email'] ?? '');
-            $username = trim($_POST['username'] ?? ''); // Actually read username from POST
+            $username = trim($_POST['username'] ?? '');
             $password = trim($_POST['password'] ?? '');
 
             $userModel = new User();
-            if ($userModel->findByUsernameOrEmail($email)) {
-                $this->render('auth/register', ['errorMessage' => 'El email ya está registrado']);
-                return;
-            }
-            if ($userModel->findByUsernameOrEmail($username)) {
-                $this->render('auth/register', ['errorMessage' => 'El nombre de usuario ya está registrado']);
+
+            // <-- MITIGACIÓN DE ENUMERACIÓN DE USUARIOS AÑADIDA
+            $emailExists = $userModel->findByUsernameOrEmail($email);
+            $userExists = $userModel->findByUsernameOrEmail($username);
+
+            if ($emailExists || $userExists) {
+                // Mensaje genérico para no revelar qué dato existe ya en la BD
+                $this->render('auth/register', ['errorMessage' => 'Si los datos son válidos, el registro se completará.']);
                 return;
             }
 
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            if ($userModel->create($username, $email, $passwordHash, 2)) { // 2 = User role
+            if ($userModel->create($username, $email, $passwordHash, 2)) {
                 $this->redirect('?registered=1');
             } else {
                 $this->render('auth/register', ['errorMessage' => 'Error al registrar']);
@@ -74,12 +80,24 @@ class AuthController extends Controller
 
     public function logout()
     {
-        session_unset();
+        // <-- DESTRUCCIÓN SEGURA DE SESIÓN AÑADIDA
+        $_SESSION = array();
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
         session_destroy();
         $this->redirect('');
     }
 
-    // Pendientes por simplicidad: forgotPassword, resetPassword, verify2fa
     public function showForgotPassword()
     {
         $this->render('auth/login', ['errorMessage' => 'Funcionalidad pendiende de implementar']);
