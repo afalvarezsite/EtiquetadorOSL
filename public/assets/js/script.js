@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         thumbnailElement.dataset.label = file.name;
     }
+
 });
 
 
@@ -147,8 +148,8 @@ function refresh_iframe() {
             }
         })
         .then(data => {
-            // Añadir timestamp para evitar caché
-            iframe.src = `${data}?t=${Date.now()}`;
+            // Añadir timestamp para evitar caché y fragmento para ajustar al ancho
+            iframe.src = `${data}?t=${Date.now()}#view=FitH`;
         })
 }
 
