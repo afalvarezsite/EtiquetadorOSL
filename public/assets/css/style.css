@@ -1510,27 +1510,24 @@ body.dark .card {
 
 .drop-zone__thumb {
     width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: var(--textarea-bg);
-    background-size: cover;
-    position: relative;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--body-bg);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    font-weight: 600;
+    font-size: 0.95rem;
+    word-break: break-all;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 10px;
+    box-shadow: 0 0 10px var(--accent-glow);
 }
 
-.drop-zone__thumb::after {
-    content: attr(data-label);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 0;
-    background: rgba(0, 0, 0, 0.75);
-    font-size: 14px;
-    text-align: center;
+.drop-zone__thumb::before {
+    content: '📄';
+    font-size: 1.2rem;
 }
 
 /* --- Danger Zone Premium --- */

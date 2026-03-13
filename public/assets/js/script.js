@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Quitar el prompt si existe
         if (promptElement) {
-            promptElement.remove();
+            promptElement.style.display = "none";
         }
 
         // Crear/Actualizar el elemento thumb
@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         thumbnailElement.dataset.label = file.name;
+        thumbnailElement.textContent = file.name;
     }
 
 });
