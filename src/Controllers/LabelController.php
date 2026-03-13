@@ -37,6 +37,7 @@ class LabelController extends Controller
             $this->redirect('generator');
             return;
         }
+        $this->verifyCsrfToken();
 
         // Obtener datos del formulario con valores por defecto
         $data = [
