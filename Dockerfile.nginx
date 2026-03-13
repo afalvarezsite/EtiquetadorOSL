@@ -18,3 +18,11 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Copy entrypoint script and set permissions
+COPY docker/nginx/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Use the entrypoint script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
