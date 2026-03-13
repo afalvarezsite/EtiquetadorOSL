@@ -176,11 +176,21 @@ h1 {
 }
 
 /* Theme Switching for UGR Logo */
-.logo-dark-ugr { display: none !important; }
-.logo-light-ugr { display: block !important; }
+.logo-dark-ugr {
+    display: none !important;
+}
 
-body.dark .logo-dark-ugr { display: block !important; }
-body.dark .logo-light-ugr { display: none !important; }
+.logo-light-ugr {
+    display: block !important;
+}
+
+body.dark .logo-dark-ugr {
+    display: block !important;
+}
+
+body.dark .logo-light-ugr {
+    display: none !important;
+}
 
 body.light .logo-ugr img,
 body.light .logo-osl {
@@ -523,6 +533,13 @@ input[type="submit"]:hover,
     -webkit-backdrop-filter: blur(10px);
     border-top: 2px solid var(--accent-cyan);
     gap: 20px;
+}
+
+.footer-text {
+    color: var(--general-color);
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin: 0;
 }
 
 .footer-content {
@@ -1636,15 +1653,12 @@ body.dark .card {
     margin-top: 30px !important;
     margin-bottom: 20px !important;
 }
+
 /* --- Responsiveness Improvements --- */
 @media (max-width: 1024px) {
     .layout {
         grid:
-            "header" auto
-            "options" auto
-            "form" auto
-            "preview" 600px
-            "footer" auto / 1fr;
+            "header" auto "options" auto "form" auto "preview" 600px "footer" auto / 1fr;
         width: 100%;
         padding: 5px;
         gap: 15px;
@@ -1710,14 +1724,14 @@ body.dark .card {
         width: 100% !important;
         max-width: 200px;
     }
-    
+
     .line {
         flex-direction: column;
         gap: 15px;
         align-items: flex-start;
     }
-    
-    .line select, 
+
+    .line select,
     .line input {
         width: 100% !important;
     }
