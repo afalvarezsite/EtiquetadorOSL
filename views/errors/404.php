@@ -7,7 +7,6 @@
     <title>404 - No Encontrado</title>
     <link rel="icon" type="image/jpg" href="<?= BASE_URL ?>assets/favicon.ico" />
     <link rel="stylesheet" href="<?= BASE_URL ?>assets/css/style.css">
-    <link rel="icon" type="image/png" href="/assets/img/favicon.png">
     <style>
         body {
             display: flex;
@@ -19,6 +18,7 @@
             color: var(--general-color);
             font-family: 'Tomorrow', sans-serif;
             text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .error-container {
@@ -60,6 +60,17 @@
 </head>
 
 <body>
+    <script>
+        // Inicializar tema al inicio del body para evitar parpadeos
+        const userPref = localStorage.getItem('theme');
+        if (userPref) {
+            document.body.classList.add(userPref);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark');
+        } else {
+            document.body.classList.add('light');
+        }
+    </script>
     <div class="error-container">
         <h1>404</h1>
         <h2>Página No Encontrada</h2>
@@ -68,4 +79,4 @@
     </div>
 </body>
 
-</html>
+</html>
