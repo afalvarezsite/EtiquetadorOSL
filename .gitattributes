@@ -1,1 +1,52 @@
-*.sh text eol=lf
+# =========================================================================
+# COMPORTAMIENTO POR DEFECTO
+# =========================================================================
+# Git detectará automáticamente los archivos de texto y normalizará los 
+# saltos de línea (los pasa a LF en el repositorio y los adapta a tu OS al hacer checkout).
+* text=auto
+
+# =========================================================================
+# ENTORNO DOCKER Y SCRIPTS (¡CRÍTICO PARA WINDOWS!)
+# =========================================================================
+# Estos archivos DEBEN usar siempre LF (saltos de línea de Linux/Unix). 
+# Si usas CRLF (Windows) aquí, los contenedores fallarán al construir o al 
+# ejecutar los entrypoints (ej. enable-ssl.sh o entrypoint.sh).
+Dockerfile* text eol=lf
+*.sh                text eol=lf
+docker-compose.yml  text eol=lf
+*.conf              text eol=lf
+
+# =========================================================================
+# CÓDIGO FUENTE (PHP, Python, SQL, JS, CSS)
+# =========================================================================
+# Indicamos explícitamente que son texto. Además, añadimos el atributo "diff" 
+# para que Git reconozca la sintaxis al mostrar los cambios (git diff).
+*.php               text diff=php
+*.py                text diff=python
+*.sql               text
+*.js                text
+*.css               text
+
+# =========================================================================
+# CONFIGURACIÓN Y DOCUMENTACIÓN
+# =========================================================================
+*.json              text
+*.md                text
+
+# =========================================================================
+# ARCHIVOS BINARIOS (Imágenes, PDFs, etc.)
+# =========================================================================
+# Marcarlos como binarios ("binary" equivale a "-text -diff") es vital para 
+# evitar que Git intente modificar sus saltos de línea, lo cual corrompería 
+# las imágenes o los PDFs subidos.
+*.pdf               binary
+*.webp              binary
+*.png               binary
+*.jpg               binary
+*.jpeg              binary
+*.ico               binary
+
+# Fuentes web (por si las añades a la carpeta assets en el futuro)
+*.woff              binary
+*.woff2             binary
+*.ttf               binary
