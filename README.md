@@ -1,7 +1,5 @@
 # 🏷️ EtiquetadorOSL
 
-![EtiquetadorOSL Header](https://via.placeholder.com/1200x400?text=EtiquetadorOSL+Logo+Header)
-
 **EtiquetadorOSL** es una herramienta *Open Source* diseñada para la gestión y etiquetado eficiente de equipos informáticos (sobremesa y portátiles). Permite documentar especificaciones técnicas y generar etiquetas listas para imprimir, además de ofrecer un panel de control para la gestión de inventario y usuarios.
 
 ---
@@ -13,8 +11,6 @@
 - **Dashboard Administrativo:** Estadísticas en tiempo real del inventario (Bluetooth, WiFi, tipos de modelos).
 - **Seguridad Integrada:** Autenticación de doble factor (2FA) vía correo electrónico.
 - **Gestión de Usuarios:** Control total sobre registros, roles y credenciales.
-
-![Funcionalidades Preview](https://via.placeholder.com/800x450?text=Vista+Previa+de+la+Plataforma)
 
 ---
 
