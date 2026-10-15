@@ -86,8 +86,6 @@ docker compose --profile apache up -d --build
    - CPU, Memoria, Disco y Gráfica.
 5. **Administración:** Accede al panel para gestionar el inventario global.
 
-![Dashboard Preview](https://via.placeholder.com/800x450?text=Dashboard+de+Administración)
-
 ---
 
 ## Administración y Seguridad
